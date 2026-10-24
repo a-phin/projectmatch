@@ -205,15 +205,46 @@ if (project) {
 
 
             <button
+                type="button"
+                id="join-button"
                 class="primary-button join-button">
 
                 Request to Join
 
             </button>
 
+
+            <div
+                id="join-message"
+                class="success-message">
+
+                Request sent to the project owner!
+
+            </div>
+
         </section>
 
     `;
+
+    // REQUEST TO JOIN
+
+    const joinButton =
+        document.getElementById("join-button");
+
+    const joinMessage =
+        document.getElementById("join-message");
+
+
+    joinButton.addEventListener("click", () => {
+
+        joinMessage.style.display = "block";
+
+        joinButton.textContent =
+            "Request Sent";
+
+        joinButton.disabled = true;
+
+    });
 
 } else {
 
