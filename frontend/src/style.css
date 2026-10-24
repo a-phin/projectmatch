@@ -771,3 +771,414 @@ button {
     }
 
 }
+
+/* PROFILE PAGE */
+
+.profile-page {
+    max-width: 850px;
+
+    margin: auto;
+
+    padding: 60px 30px 100px;
+}
+
+
+.save-profile-button {
+    width: 100%;
+
+    margin-top: 10px;
+}
+
+/* FIND TEAMMATES */
+
+.teammates-page {
+    max-width: 1100px;
+
+    margin: auto;
+
+    padding: 60px 30px 100px;
+}
+
+
+.teammates-header {
+    margin-bottom: 35px;
+}
+
+
+.teammates-header h1 {
+    font-size: 42px;
+
+    margin: 8px 0;
+}
+
+
+.teammates-header p {
+    color: #6b7280;
+}
+
+
+/* SEARCH */
+
+.teammate-search-section {
+    margin-bottom: 30px;
+}
+
+
+#teammate-search {
+    width: 100%;
+
+    padding: 15px 18px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    outline: none;
+}
+
+
+#teammate-search:focus {
+    border-color: #6366f1;
+}
+
+
+/* STUDENT GRID */
+
+.student-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 22px;
+}
+
+
+/* STUDENT CARD */
+
+.student-card {
+    background-color: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    padding: 28px;
+}
+
+
+.student-card:hover {
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+
+/* CARD HEADER */
+
+.student-card-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 20px;
+}
+
+
+.student-card-header h2 {
+    margin: 0;
+}
+
+
+.student-major {
+    color: #6b7280;
+
+    margin-top: 7px;
+}
+
+
+/* MATCH */
+
+.student-match {
+    background-color: #eef2ff;
+
+    color: #4f46e5;
+
+    padding: 8px 11px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+
+/* STUDENT INFO */
+
+.student-section {
+    margin-top: 22px;
+}
+
+
+.student-section h3 {
+    font-size: 14px;
+
+    margin-bottom: 8px;
+}
+
+
+.student-section p {
+    color: #6b7280;
+
+    margin: 0;
+}
+
+
+/* MATCH REASONS */
+
+.match-reasons {
+    margin-top: 25px;
+
+    padding: 18px;
+
+    background-color: #f9fafb;
+
+    border-radius: 10px;
+}
+
+
+.match-reasons h3 {
+    margin-top: 0;
+
+    font-size: 14px;
+}
+
+
+.match-reasons ul {
+    list-style: none;
+
+    padding: 0;
+
+    margin-bottom: 0;
+}
+
+
+.match-reasons li {
+    color: #4b5563;
+
+    margin: 8px 0;
+
+    font-size: 14px;
+}
+
+
+/* VIEW PROFILE */
+
+.view-profile-button {
+    width: 100%;
+
+    margin-top: 22px;
+
+    background-color: #111827;
+
+    color: white;
+
+    border: none;
+}
+
+
+.view-profile-button:hover {
+    background-color: #374151;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 750px) {
+
+    .student-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* STUDENT PROFILE */
+
+.student-profile-page {
+    max-width: 900px;
+
+    margin: auto;
+
+    padding: 50px 30px 100px;
+}
+
+
+.student-profile-card {
+    background-color: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    padding: 40px;
+}
+
+
+/* PROFILE HEADER */
+
+.student-profile-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+
+.student-avatar {
+    width: 75px;
+    height: 75px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background-color: #eef2ff;
+
+    color: #4f46e5;
+
+    border-radius: 50%;
+
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+.student-profile-name {
+    flex: 1;
+}
+
+
+.student-profile-name h1 {
+    margin: 0;
+
+    font-size: 32px;
+}
+
+
+.student-profile-name p {
+    margin: 7px 0 0;
+
+    color: #6b7280;
+}
+
+
+.student-profile-card hr {
+    border: 0;
+
+    border-top: 1px solid #e5e7eb;
+
+    margin: 30px 0;
+}
+
+
+/* PROFILE SECTIONS */
+
+.student-profile-section {
+    margin-top: 30px;
+}
+
+
+.student-profile-section h2 {
+    font-size: 18px;
+}
+
+
+.student-profile-section p {
+    color: #6b7280;
+}
+
+
+/* INTEREST TAGS */
+
+.interest-list {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+
+.interest-tag {
+    background-color: #f3f4f6;
+
+    color: #4b5563;
+
+    padding: 7px 11px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+}
+
+
+/* MATCH REASONS */
+
+.profile-match-reasons {
+    margin-top: 35px;
+
+    background-color: #f9fafb;
+
+    padding: 22px;
+
+    border-radius: 12px;
+}
+
+
+.profile-match-reasons h2 {
+    margin-top: 0;
+
+    font-size: 18px;
+}
+
+
+.profile-match-reasons ul {
+    list-style: none;
+
+    padding: 0;
+
+    margin-bottom: 0;
+}
+
+
+.profile-match-reasons li {
+    margin: 10px 0;
+
+    color: #4b5563;
+}
+
+
+/* INVITE */
+
+.invite-button {
+    width: 100%;
+
+    margin-top: 30px;
+}
+
+
+.invite-button:disabled {
+    opacity: 0.6;
+
+    cursor: default;
+}

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profile | ProjectMatch</title>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            <a href="index.html">ProjectMatch</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="discover.html">Discover</a>
+            <a href="find-teammates.html">Find Teammates</a>
+            <a href="post-project.html">Post a Project</a>
+            <a href="profile.html">Profile</a>
+        </div>
+
+    </nav>
+
+
+    <main class="profile-page">
+
+        <div class="form-header">
+
+            <p class="hero-label">
+                YOUR PROFILE
+            </p>
+
+            <h1>Tell us about yourself</h1>
+
+            <p>
+                We'll use your skills, interests, and goals
+                to help you find projects and teammates.
+            </p>
+
+        </div>
+
+
+        <form id="profile-form" class="project-form">
+
+
+            <!-- NAME -->
+
+            <div class="form-group">
+
+                <label for="student-name">
+                    Name
+                </label>
+
+                <input
+                    type="text"
+                    id="student-name"
+                    placeholder="Your name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- MAJOR + YEAR -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="major">
+                        Major
+                    </label>
+
+                    <input
+                        type="text"
+                        id="major"
+                        placeholder="Computer Science"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="year">
+                        Year
+                    </label>
+
+                    <select id="year" required>
+
+                        <option value="">
+                            Select your year
+                        </option>
+
+                        <option value="First Year">
+                            First Year
+                        </option>
+
+                        <option value="Second Year">
+                            Second Year
+                        </option>
+
+                        <option value="Third Year">
+                            Third Year
+                        </option>
+
+                        <option value="Fourth Year">
+                            Fourth Year
+                        </option>
+
+                        <option value="Graduate">
+                            Graduate Student
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- SKILLS -->
+
+            <div class="form-group">
+
+                <label for="skills">
+                    Your Skills
+                </label>
+
+                <input
+                    type="text"
+                    id="skills"
+                    placeholder="JavaScript, Python, Design"
+                    required
+                >
+
+                <small>
+                    Separate skills with commas.
+                </small>
+
+            </div>
+
+
+            <!-- INTERESTS -->
+
+            <div class="form-group">
+
+                <label for="interests">
+                    Interests
+                </label>
+
+                <input
+                    type="text"
+                    id="interests"
+                    placeholder="AI, Sustainability, Healthcare"
+                    required
+                >
+
+                <small>
+                    What kinds of projects interest you?
+                </small>
+
+            </div>
+
+
+            <!-- LEARNING -->
+
+            <div class="form-group">
+
+                <label for="learning">
+                    Skills You Want to Learn
+                </label>
+
+                <input
+                    type="text"
+                    id="learning"
+                    placeholder="React, Machine Learning, UI/UX"
+                >
+
+            </div>
+
+
+            <!-- AVAILABILITY -->
+
+            <div class="form-group">
+
+                <label for="availability">
+                    Weekly Availability
+                </label>
+
+                <select id="availability" required>
+
+                    <option value="">
+                        Select your availability
+                    </option>
+
+                    <option value="1-2">
+                        1-2 hours/week
+                    </option>
+
+                    <option value="3-5">
+                        3-5 hours/week
+                    </option>
+
+                    <option value="6-8">
+                        6-8 hours/week
+                    </option>
+
+                    <option value="9+">
+                        9+ hours/week
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- LOOKING FOR -->
+
+            <div class="form-group">
+
+                <label for="looking-for">
+                    What are you looking for?
+                </label>
+
+                <select id="looking-for" required>
+
+                    <option value="">
+                        Select one
+                    </option>
+
+                    <option value="Join Projects">
+                        Join Projects
+                    </option>
+
+                    <option value="Find Teammates">
+                        Find Teammates
+                    </option>
+
+                    <option value="Both">
+                        Both
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-button save-profile-button">
+
+                Save Profile
+
+            </button>
+
+        </form>
+
+
+        <div
+            id="profile-success"
+            class="success-message">
+
+            Profile saved successfully!
+
+        </div>
+
+    </main>
+
+
+    <script
+        type="module"
+        src="/src/profile.js">
+    </script>
+
+</body>
+
+</html>
