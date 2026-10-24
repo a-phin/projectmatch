@@ -8,8 +8,6 @@ from dataclasses import dataclass, field
 # experience - beginer, 
 
 
-# matching.py
-
 def rank_projects(student, projects):
     # only projects that still have room
     open_projects = [p for p in projects if p["current_team_amount"] < p["max_team_amount"]]
