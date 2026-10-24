@@ -1,0 +1,8 @@
+CREATE TABLE projects (
+    title TEXT NOT NULL, 
+    description TEXT, status TEXT
+);
+
+CREATE TABLE tags (
+
+);
