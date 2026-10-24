@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Discover Projects | ProjectMatch</title>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html">ProjectMatch</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="discover.html">Discover</a>
+            <a href="#">Find Teammates</a>
+            <a href="#">Post a Project</a>
+            <a href="#">Profile</a>
+        </div>
+    </nav>
+
+
+    <main class="discover-page">
+
+        <section class="discover-header">
+
+            <p class="hero-label">
+                FIND YOUR NEXT PROJECT
+            </p>
+
+            <h1>Discover Projects</h1>
+
+            <p>
+                Find projects that match your skills,
+                interests, and availability.
+            </p>
+
+        </section>
+
+
+        <section class="search-section">
+
+            <input
+                type="text"
+                id="project-search"
+                placeholder="Search projects..."
+            >
+
+            <div class="filters">
+
+                <button class="filter-button active" data-category="All">
+                    All
+                </button>
+
+                <button class="filter-button" data-category="Technology">
+                    Technology
+                </button>
+
+                <button class="filter-button" data-category="Research">
+                    Research
+                </button>
+
+                <button class="filter-button" data-category="Community">
+                    Community
+                </button>
+
+                <button class="filter-button" data-category="Creative">
+                    Creative
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="project-grid"
+            id="project-container">
+        </section>
+
+    </main>
+
+
+    <script type="module" src="/src/discover.js"></script>
+
+</body>
+
+</html>

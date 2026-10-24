@@ -1,13 +1,104 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="app"></div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ProjectMatch</title>
+</head>
+
+<body>
+
+    <div id="app">
+
+        <nav class="navbar">
+            <div class="logo">
+                ProjectMatch
+            </div>
+
+            <div class="nav-links">
+                <a href="#">Discover</a>
+                <a href="#">Find Teammates</a>
+                <a href="#">Post a Project</a>
+                <a href="#">Profile</a>
+            </div>
+        </nav>
+
+
+        <main>
+
+            <section class="hero">
+
+                <p class="hero-label">
+                    BUILD SOMETHING TOGETHER
+                </p>
+
+                <h1>
+                    Your next project is
+                    <span>looking for you.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Discover projects that match your skills,
+                    interests, and goals. Find teammates across
+                    different majors and turn ideas into something real.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <button class="primary-button" id="find-project">
+                        Find a Project
+                    </button>
+
+                    <button class="secondary-button" id="post-project">
+                        Post a Project
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <section class="features">
+
+                <div class="feature-card">
+                    <h3>Discover</h3>
+
+                    <p>
+                        Explore projects from students across
+                        different majors and interests.
+                    </p>
+                </div>
+
+
+                <div class="feature-card">
+                    <h3>Match</h3>
+
+                    <p>
+                        Find projects that fit your skills,
+                        interests, and availability.
+                    </p>
+                </div>
+
+
+                <div class="feature-card">
+                    <h3>Build</h3>
+
+                    <p>
+                        Connect with students whose skills
+                        complement your own.
+                    </p>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
     <script type="module" src="/src/main.js"></script>
-  </body>
+
+</body>
+
 </html>
