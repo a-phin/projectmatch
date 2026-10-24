@@ -1,11 +1,6 @@
 from dataclasses import dataclass, field
 
-# skills 
-# time (in total)
-# goal to do/learns
-# interests/genre
-# major -  
-# experience - beginer, 
+# This is the ranking system
 
 
 def rank_projects(student, projects):
