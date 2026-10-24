@@ -6,6 +6,7 @@ const projects = [
     {
         id: 1,
         title: "FoodLoop",
+
         description:
             "Reduce food waste by connecting leftover campus food with students and community organizations.",
 
@@ -31,6 +32,7 @@ const projects = [
     {
         id: 2,
         title: "PlantVision",
+
         description:
             "Use computer vision to help identify common plant diseases from photos.",
 
@@ -56,6 +58,7 @@ const projects = [
     {
         id: 3,
         title: "Campus Closet",
+
         description:
             "Create a student clothing exchange that makes donating and finding clothes easier.",
 
@@ -81,6 +84,7 @@ const projects = [
     {
         id: 4,
         title: "StoryMap",
+
         description:
             "Create an interactive map that shares stories from local businesses and community members.",
 
@@ -106,6 +110,7 @@ const projects = [
     {
         id: 5,
         title: "StudySpot",
+
         description:
             "Help students find available study spaces based on location, noise level, and amenities.",
 
@@ -130,6 +135,8 @@ const projects = [
 ];
 
 
+// DISPLAY PROJECTS
+
 function displayProjects(projectList) {
 
     const container =
@@ -140,10 +147,13 @@ function displayProjects(projectList) {
 
     projectList.forEach(project => {
 
-        const card = document.createElement("article");
+        const card =
+            document.createElement("article");
 
         card.className = "project-card";
 
+
+        // CREATE SKILL TAGS
 
         const skillTags = project.skills
             .map(skill =>
@@ -151,20 +161,34 @@ function displayProjects(projectList) {
             )
             .join("");
 
+
+        // DETERMINE TEAM STATUS
+
         let teamStatus = "";
         let statusClass = "";
 
+
         if (project.members >= project.teamSize) {
+
             teamStatus = "Team Full";
             statusClass = "status-full";
-        } else if (project.teamSize - project.members === 1) {
+
+        } else if (
+            project.teamSize - project.members === 1
+        ) {
+
             teamStatus = "1 Spot Left";
             statusClass = "status-limited";
+
         } else {
+
             teamStatus = "Looking for Teammates";
             statusClass = "status-open";
+
         }
 
+
+        // CREATE PROJECT CARD
 
         card.innerHTML = `
 
@@ -181,12 +205,19 @@ function displayProjects(projectList) {
             </div>
 
 
-            <h2>${project.title}</h2>
+            <h2>
+                ${project.title}
+            </h2>
+
 
             <div class="team-status ${statusClass}">
+
                 <span class="status-dot"></span>
+
                 ${teamStatus}
+
             </div>
+
 
             <p class="project-description">
                 ${project.description}
@@ -194,7 +225,9 @@ function displayProjects(projectList) {
 
 
             <div class="skill-list">
+
                 ${skillTags}
+
             </div>
 
 
@@ -216,6 +249,7 @@ function displayProjects(projectList) {
 
 
             <button
+                type="button"
                 class="view-project-button"
                 data-id="${project.id}">
 
@@ -233,4 +267,78 @@ function displayProjects(projectList) {
 }
 
 
+// DISPLAY PROJECTS WHEN PAGE LOADS
+
 displayProjects(projects);
+
+
+// VIEW PROJECT BUTTON
+
+document
+    .getElementById("project-container")
+    .addEventListener("click", (event) => {
+
+        if (
+            event.target.classList.contains(
+                "view-project-button"
+            )
+        ) {
+
+            const projectId =
+                event.target.dataset.id;
+
+
+            window.location.href =
+                `./project.html?id=${projectId}`;
+
+        }
+
+    });
+
+// SEARCH PROJECTS
+
+const searchInput =
+    document.getElementById("project-search");
+
+
+searchInput.addEventListener("input", () => {
+
+    const searchText =
+        searchInput.value.toLowerCase();
+
+
+    const filteredProjects =
+        projects.filter(project => {
+
+            const titleMatch =
+                project.title
+                    .toLowerCase()
+                    .includes(searchText);
+
+
+            const descriptionMatch =
+                project.description
+                    .toLowerCase()
+                    .includes(searchText);
+
+
+            const skillMatch =
+                project.skills.some(skill =>
+                    skill
+                        .toLowerCase()
+                        .includes(searchText)
+                );
+
+
+            return (
+                titleMatch ||
+                descriptionMatch ||
+                skillMatch
+            );
+
+        });
+
+
+    displayProjects(filteredProjects);
+
+});

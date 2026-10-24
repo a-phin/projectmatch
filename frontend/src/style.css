@@ -484,3 +484,138 @@ button {
 .status-full .status-dot {
     background-color: #ef4444;
 }
+
+/* PROJECT DETAILS */
+
+.project-page {
+    max-width: 1000px;
+    margin: auto;
+
+    padding: 50px 30px 100px;
+}
+
+
+.back-link {
+    display: inline-block;
+
+    margin-bottom: 30px;
+
+    text-decoration: none;
+
+    color: #6366f1;
+
+    font-weight: bold;
+}
+
+
+.project-main {
+    background-color: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    padding: 45px;
+}
+
+
+.project-title-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 30px;
+}
+
+
+.project-title-row h1 {
+    font-size: 45px;
+
+    margin: 10px 0;
+}
+
+
+.large-match-score {
+    min-width: 100px;
+
+    text-align: center;
+
+    background-color: #eef2ff;
+
+    color: #4f46e5;
+
+    padding: 15px;
+
+    border-radius: 12px;
+}
+
+
+.large-match-score strong {
+    display: block;
+
+    font-size: 27px;
+}
+
+
+.large-match-score span {
+    font-size: 13px;
+}
+
+
+.project-lead {
+    max-width: 700px;
+
+    color: #6b7280;
+
+    line-height: 1.7;
+
+    font-size: 18px;
+}
+
+
+.project-meta {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 25px;
+
+    margin: 25px 0;
+
+    color: #6b7280;
+}
+
+
+.project-main hr {
+    border: 0;
+
+    border-top: 1px solid #e5e7eb;
+
+    margin: 35px 0;
+}
+
+
+.project-main h2 {
+    margin-top: 30px;
+}
+
+
+.project-about {
+    color: #4b5563;
+
+    line-height: 1.7;
+}
+
+
+.role-list {
+    line-height: 2;
+
+    color: #4b5563;
+}
+
+
+.join-button {
+    margin-top: 25px;
+}
