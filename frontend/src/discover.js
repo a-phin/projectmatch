@@ -342,3 +342,51 @@ searchInput.addEventListener("input", () => {
     displayProjects(filteredProjects);
 
 });
+
+// CATEGORY FILTERS
+
+const filterButtons =
+    document.querySelectorAll(".filter-button");
+
+
+filterButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        // Remove active style from every button
+
+        filterButtons.forEach(btn =>
+            btn.classList.remove("active")
+        );
+
+
+        // Add active style to clicked button
+
+        button.classList.add("active");
+
+
+        const category =
+            button.dataset.category;
+
+
+        // Show everything if All is selected
+
+        if (category === "All") {
+
+            displayProjects(projects);
+
+        } else {
+
+            const filteredProjects =
+                projects.filter(project =>
+                    project.category === category
+                );
+
+
+            displayProjects(filteredProjects);
+
+        }
+
+    });
+
+});

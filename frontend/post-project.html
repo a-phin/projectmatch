@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Post a Project | ProjectMatch</title>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            <a href="index.html">ProjectMatch</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="discover.html">Discover</a>
+            <a href="#">Find Teammates</a>
+            <a href="post-project.html">Post a Project</a>
+            <a href="#">Profile</a>
+        </div>
+
+    </nav>
+
+
+    <main class="post-project-page">
+
+        <div class="form-header">
+
+            <p class="hero-label">
+                FIND YOUR TEAM
+            </p>
+
+            <h1>Post a Project</h1>
+
+            <p>
+                Share what you're building and find students
+                with the skills you need.
+            </p>
+
+        </div>
+
+
+        <form id="project-form" class="project-form">
+
+            <div class="form-group">
+
+                <label for="project-title">
+                    Project Name
+                </label>
+
+                <input
+                    type="text"
+                    id="project-title"
+                    placeholder="Example: FoodLoop"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="project-description">
+                    Short Description
+                </label>
+
+                <textarea
+                    id="project-description"
+                    placeholder="What are you building?"
+                    rows="4"
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="project-category">
+                        Category
+                    </label>
+
+                    <select id="project-category" required>
+
+                        <option value="">
+                            Select a category
+                        </option>
+
+                        <option value="Technology">
+                            Technology
+                        </option>
+
+                        <option value="Research">
+                            Research
+                        </option>
+
+                        <option value="Community">
+                            Community
+                        </option>
+
+                        <option value="Creative">
+                            Creative
+                        </option>
+
+                        <option value="Business">
+                            Business
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="project-stage">
+                        Project Stage
+                    </label>
+
+                    <select id="project-stage" required>
+
+                        <option value="">
+                            Select a stage
+                        </option>
+
+                        <option value="Idea">
+                            Idea
+                        </option>
+
+                        <option value="Forming Team">
+                            Forming Team
+                        </option>
+
+                        <option value="Prototype">
+                            Prototype
+                        </option>
+
+                        <option value="Building">
+                            Building
+                        </option>
+
+                        <option value="Needs Rescue">
+                            Needs Rescue
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="project-skills">
+                    Skills Needed
+                </label>
+
+                <input
+                    type="text"
+                    id="project-skills"
+                    placeholder="Python, UI/UX, Marketing"
+                    required
+                >
+
+                <small>
+                    Separate each skill with a comma.
+                </small>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="team-size">
+                        Desired Team Size
+                    </label>
+
+                    <input
+                        type="number"
+                        id="team-size"
+                        min="2"
+                        max="20"
+                        value="4"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="hours">
+                        Weekly Commitment
+                    </label>
+
+                    <select id="hours" required>
+
+                        <option value="1-2">
+                            1-2 hours/week
+                        </option>
+
+                        <option value="3-5">
+                            3-5 hours/week
+                        </option>
+
+                        <option value="6-8">
+                            6-8 hours/week
+                        </option>
+
+                        <option value="9+">
+                            9+ hours/week
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="project-about">
+                    About the Project
+                </label>
+
+                <textarea
+                    id="project-about"
+                    rows="6"
+                    placeholder="Tell potential teammates more about the problem, your idea, and what you hope to build."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="roles-needed">
+                    Who Are You Looking For?
+                </label>
+
+                <input
+                    type="text"
+                    id="roles-needed"
+                    placeholder="Frontend Developer, Designer, Biology Student"
+                    required
+                >
+
+                <small>
+                    Separate roles with commas.
+                </small>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="discover.html"
+                    class="cancel-button">
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="primary-button">
+
+                    Post Project
+
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <div
+            id="success-message"
+            class="success-message">
+
+            Project posted successfully!
+
+        </div>
+
+    </main>
+
+
+    <script
+        type="module"
+        src="/src/post-project.js">
+    </script>
+
+</body>
+
+</html>

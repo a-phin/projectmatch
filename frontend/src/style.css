@@ -619,3 +619,155 @@ button {
 .join-button {
     margin-top: 25px;
 }
+
+/* POST PROJECT PAGE */
+
+.post-project-page {
+    max-width: 850px;
+    margin: auto;
+
+    padding: 60px 30px 100px;
+}
+
+
+.form-header {
+    margin-bottom: 35px;
+}
+
+
+.form-header h1 {
+    font-size: 42px;
+
+    margin: 8px 0;
+}
+
+
+.form-header p {
+    color: #6b7280;
+}
+
+
+/* FORM */
+
+.project-form {
+    background-color: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    padding: 35px;
+}
+
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-bottom: 25px;
+}
+
+
+.form-group label {
+    font-weight: bold;
+
+    color: #374151;
+}
+
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+}
+
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #6366f1;
+}
+
+
+.form-group small {
+    color: #9ca3af;
+}
+
+
+.form-row {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 20px;
+}
+
+
+/* FORM BUTTONS */
+
+.form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 15px;
+}
+
+
+.cancel-button {
+    text-decoration: none;
+
+    color: #6b7280;
+
+    padding: 14px 20px;
+}
+
+
+.success-message {
+    display: none;
+
+    margin-top: 20px;
+
+    padding: 15px 20px;
+
+    background-color: #ecfdf5;
+
+    color: #047857;
+
+    border: 1px solid #a7f3d0;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+}
+
+
+@media (max-width: 650px) {
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+}
