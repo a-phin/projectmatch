@@ -425,3 +425,62 @@ button {
     }
 
 }
+
+/* TEAM STATUS */
+
+.team-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 6px 10px;
+    margin-bottom: 10px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+}
+
+
+/* OPEN */
+
+.status-open {
+    background-color: #ecfdf5;
+    color: #047857;
+}
+
+.status-open .status-dot {
+    background-color: #10b981;
+}
+
+
+/* ALMOST FULL */
+
+.status-limited {
+    background-color: #fffbeb;
+    color: #b45309;
+}
+
+.status-limited .status-dot {
+    background-color: #f59e0b;
+}
+
+
+/* FULL */
+
+.status-full {
+    background-color: #fef2f2;
+    color: #b91c1c;
+}
+
+.status-full .status-dot {
+    background-color: #ef4444;
+}

@@ -151,6 +151,20 @@ function displayProjects(projectList) {
             )
             .join("");
 
+        let teamStatus = "";
+        let statusClass = "";
+
+        if (project.members >= project.teamSize) {
+            teamStatus = "Team Full";
+            statusClass = "status-full";
+        } else if (project.teamSize - project.members === 1) {
+            teamStatus = "1 Spot Left";
+            statusClass = "status-limited";
+        } else {
+            teamStatus = "Looking for Teammates";
+            statusClass = "status-open";
+        }
+
 
         card.innerHTML = `
 
@@ -169,6 +183,10 @@ function displayProjects(projectList) {
 
             <h2>${project.title}</h2>
 
+            <div class="team-status ${statusClass}">
+                <span class="status-dot"></span>
+                ${teamStatus}
+            </div>
 
             <p class="project-description">
                 ${project.description}
