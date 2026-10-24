@@ -5,8 +5,7 @@ CREATE TABLE projects (
     current_team_amount INTEGER NOT NULL DEFAULT 1,
     max_team_amount INTEGER NOT NULL,
     min_hours INTEGER,
-    max_hours INTEGER,
-    project_lead INTEGER REFERENCES users(id)
+    max_hours INTEGER
 );
 
 CREATE TABLE skills (
