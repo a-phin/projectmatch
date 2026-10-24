@@ -6,16 +6,24 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PROJECTS_DB = DATA_DIR / "projects.db"
 USERS_DB = DATA_DIR / "users.db"
 
+'''Predefined Options.'''
+
 # List of categories stored in a categories constant variable.
 CATEGORIES = ["Technology", "Research", "Community", "Creative"]
+
+# Class status predefined options stored in a years constant variable.
+YEARS = ["First Year", "Second Year", "Third Year", "Fourth Year", "Graduate"]
 
 # List of skills stored in a skills constant variable.
 SKILLS = [
     "Python", "JavaScript", "Java", "SQL", "Web Development", "AI",
     "UI/UX", "Design", "Web Design", "Photography", "Video Editing",
     "Marketing", "Business Strategy", "Biology", "Psychology",
-    "Journalism", "Writing", "Education", "Music",
+    "Journalism", "Writing", "Education", "Music"
 ]
+
+# List of predefined availability options stored in a constant variable.
+AVAILABILITY = ["1-2"]
 
 # GENERAL DATABASE COMMANDS
 def get_connection(path):
@@ -86,7 +94,7 @@ def delete_project(title, project_lead):
 
 
 def get_projects(category=None):
-    connection = sqlite3.connect("projects.db")
+    connection = get_connection(PROJECTS_DB)
     if category and category != "All":
         rows = connection.execute("SELECT * FROM projects WHERE category = ?", (category,)).fetchall()
     else:
