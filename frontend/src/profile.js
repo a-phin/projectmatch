@@ -8,6 +8,29 @@ const successMessage =
     document.getElementById("profile-success");
 
 
+async function readApiResponse(response) {
+    const body = await response.text();
+    let data;
+
+    try {
+        data = body ? JSON.parse(body) : {};
+    } catch {
+        const status = `HTTP ${response.status}`;
+        throw new Error(
+            `The profile API returned a non-JSON response (${status}). ` +
+            "Check that the Flask backend is running on port 5001, then " +
+            "look at its terminal for the server error."
+        );
+    }
+
+    if (!response.ok) {
+        throw new Error(data.error || `Profile request failed (HTTP ${response.status}).`);
+    }
+
+    return data;
+}
+
+
 async function loadProfile() {
     try {
         const response = await fetch("/api/me", {
@@ -17,9 +40,7 @@ async function loadProfile() {
             window.location.href = "login.html";
             return;
         }
-        if (!response.ok) throw new Error("Could not load your profile.");
-
-        const user = await response.json();
+        const user = await readApiResponse(response);
         document.getElementById("student-name").value = user.name || "";
         document.getElementById("major").value = user.major || "";
         document.getElementById("year").value = user.year || "";
@@ -109,21 +130,7 @@ profileForm.addEventListener("submit", async (event) => {
             );
 
 
-        if (!response.ok) {
-
-            const errorData =
-                await response.json();
-
-            throw new Error(
-                errorData.error ||
-                "Could not update profile."
-            );
-
-        }
-
-
-        const createdUser =
-            await response.json();
+        const createdUser = await readApiResponse(response);
 
 
         console.log(
