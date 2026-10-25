@@ -1,5 +1,3 @@
-from dataclasses import dataclass, field
-
 # This is the ranking system
 
 
@@ -27,8 +25,8 @@ def score_skills(student_skills, project_skills):
     if not student_skills or not project_skills:
         return 25  # no data, so give half the points so it doesn't go unnoticed
 
-    have = {s.lower() for s in student_skills}
-    needed = {s.lower() for s in project_skills}
+    have = {s.strip().lower() for s in student_skills if isinstance(s, str)}
+    needed = {s.strip().lower() for s in project_skills if isinstance(s, str)}
     return 50 * len(have & needed) / len(needed) #checks for overlap and returns score from that
 
 
@@ -42,7 +40,10 @@ def score_hours(student_hours, min_hours, max_hours):
     # Student availability may be stored as "3-5"
     # or as a single value such as "5".
     try:
-        if isinstance(student_hours, str) and "-" in student_hours:
+        if isinstance(student_hours, str) and student_hours.strip().endswith("+"):
+            student_min = int(student_hours.strip()[:-1])
+            student_max = 999
+        elif isinstance(student_hours, str) and "-" in student_hours:
             parts = student_hours.split("-")
             student_min = int(parts[0].strip())
             student_max = int(parts[1].strip())
@@ -72,12 +73,12 @@ def score_category(student_interests, category):
     if not student_interests:
         return 12.5  # no data, so give half the points
 
-    interests = [i.lower() for i in student_interests]
-    return 25 if category.lower() in interests else 0 #checks if category is in interests
+    interests = [i.strip().lower() for i in student_interests if isinstance(i, str)]
+    return 25 if isinstance(category, str) and category.strip().lower() in interests else 0
 
 #test 
 if __name__ == "__main__":
-    student = {"skills": ["python", "sql"], "hours": 6, "interests": ["web"]}
+    student = {"skills": ["python", "sql"], "availability": 6, "interests": ["web"]}
     project = {
         "id": 1, "title": "Campus Tutor Finder", "category": "Web",
         "current_team_amount": 2, "max_team_amount": 5,

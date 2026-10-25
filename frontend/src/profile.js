@@ -8,6 +8,33 @@ const successMessage =
     document.getElementById("profile-success");
 
 
+async function loadProfile() {
+    try {
+        const response = await fetch("/api/me", {
+            credentials: "include"
+        });
+        if (response.status === 401) {
+            window.location.href = "login.html";
+            return;
+        }
+        if (!response.ok) throw new Error("Could not load your profile.");
+
+        const user = await response.json();
+        document.getElementById("student-name").value = user.name || "";
+        document.getElementById("major").value = user.major || "";
+        document.getElementById("year").value = user.year || "";
+        document.getElementById("skills").value = (user.skills || []).join(", ");
+        document.getElementById("interests").value = (user.interests || []).join(", ");
+        document.getElementById("learning").value = (user.skills_to_learn || []).join(", ");
+        document.getElementById("availability").value = user.availability || "";
+        document.getElementById("looking-for").value = user.looking_for || "Both";
+    } catch (error) {
+        console.error("Could not load profile:", error);
+        alert(error.message);
+    }
+}
+
+
 profileForm.addEventListener("submit", async (event) => {
 
     event.preventDefault();
@@ -42,8 +69,19 @@ profileForm.addEventListener("submit", async (event) => {
                 .map(interest => interest.trim())
                 .filter(interest => interest !== ""),
 
+        skills_to_learn:
+            document
+                .getElementById("learning")
+                .value
+                .split(",")
+                .map(skill => skill.trim())
+                .filter(skill => skill !== ""),
+
         availability:
-            document.getElementById("availability").value
+            document.getElementById("availability").value,
+
+        looking_for:
+            document.getElementById("looking-for").value
 
     };
 
@@ -55,7 +93,7 @@ profileForm.addEventListener("submit", async (event) => {
 
         const response =
             await fetch(
-                "http://127.0.0.1:5001/api/me",
+                "/api/me",
                 {
                     method: "PUT",
 
@@ -78,7 +116,7 @@ profileForm.addEventListener("submit", async (event) => {
 
             throw new Error(
                 errorData.error ||
-                "Could not create profile."
+                "Could not update profile."
             );
 
         }
@@ -89,7 +127,7 @@ profileForm.addEventListener("submit", async (event) => {
 
 
         console.log(
-            "Student Profile Created:",
+            "Student Profile Updated:",
             createdUser
         );
 
@@ -113,10 +151,13 @@ profileForm.addEventListener("submit", async (event) => {
 
 
         alert(
-            "Could not create profile. " +
+            "Could not update profile. " +
             error.message
         );
 
     }
 
 });
+
+
+loadProfile();

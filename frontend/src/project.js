@@ -1,4 +1,5 @@
 import './style.css';
+import { escapeHtml } from './html.js';
 
 
 // GET PROJECT ID FROM URL
@@ -29,27 +30,9 @@ async function loadProject() {
 
     try {
 
-        // Hackathon demo user
-        const currentUserId = 1;
-
-
-        // Get project information
-        // and match information
-
-        const [
-            projectResponse,
-            matchesResponse
-        ] = await Promise.all([
-
-            fetch(
-                `http://127.0.0.1:5001/api/projects/${projectId}`
-            ),
-
-            fetch(
-                `http://127.0.0.1:5001/api/users/${currentUserId}/matches`
-            )
-
-        ]);
+        const projectResponse = await fetch(
+            `/api/projects/${projectId}`
+        );
 
 
         if (projectResponse.status === 404) {
@@ -65,18 +48,21 @@ async function loadProject() {
         }
 
 
-        if (!matchesResponse.ok) {
-            throw new Error(
-                "Could not load match information."
-            );
-        }
-
-
         const data =
             await projectResponse.json();
 
-        const matches =
-            await matchesResponse.json();
+        let matches = [];
+        try {
+            const matchesResponse = await fetch(
+                "/api/me/matches",
+                { credentials: "include" }
+            );
+            if (matchesResponse.ok) {
+                matches = await matchesResponse.json();
+            }
+        } catch (error) {
+            console.warn("Could not load personalized matches:", error);
+        }
 
 
         // Find the match result for this project
@@ -100,7 +86,11 @@ async function loadProject() {
                 data.max_team_amount,
 
             hours:
-                `${data.min_hours}-${data.max_hours}`,
+                data.min_hours == null
+                    ? "Not specified"
+                    : data.max_hours == null
+                        ? `${data.min_hours}+`
+                        : `${data.min_hours}-${data.max_hours}`,
 
             stage:
                 data.stage || "Building",
@@ -108,7 +98,7 @@ async function loadProject() {
             match:
                 matchResult
                     ? matchResult.score
-                    : 0,
+                    : null,
 
             matchBreakdown:
                 matchResult
@@ -120,7 +110,7 @@ async function loadProject() {
                 data.description,
 
             lookingFor:
-                data.lookingFor || []
+                data.looking_for || []
 
         };
 
@@ -161,7 +151,7 @@ function displayProject(project) {
 
     const skillTags = skills
         .map(skill =>
-            `<span class="skill-tag">${skill}</span>`
+            `<span class="skill-tag">${escapeHtml(skill)}</span>`
         )
         .join("");
 
@@ -169,7 +159,7 @@ function displayProject(project) {
     const roles =
         project.lookingFor
             .map(role =>
-                `<li>${role}</li>`
+                `<li>${escapeHtml(role)}</li>`
             )
             .join("");
 
@@ -209,11 +199,11 @@ function displayProject(project) {
                 <div>
 
                     <span class="project-category">
-                        ${project.category}
+                        ${escapeHtml(project.category)}
                     </span>
 
                     <h1>
-                        ${project.title}
+                        ${escapeHtml(project.title)}
                     </h1>
 
                 </div>
@@ -222,7 +212,7 @@ function displayProject(project) {
                 <div class="large-match-score">
 
                     <strong>
-                        ${project.match}%
+                        ${project.match == null ? "—" : `${escapeHtml(project.match)}%`}
                     </strong>
 
                     <span>
@@ -235,7 +225,7 @@ function displayProject(project) {
 
 
             <p class="project-lead">
-                ${project.description}
+                ${escapeHtml(project.description)}
             </p>
 
 
@@ -256,15 +246,15 @@ function displayProject(project) {
             <div class="project-meta">
 
                 <span>
-                    👥 ${project.members}/${project.teamSize}
+                    👥 ${escapeHtml(project.members)}/${escapeHtml(project.teamSize)}
                 </span>
 
                 <span>
-                    ⏱ ${project.hours} hrs/week
+                    ⏱ ${escapeHtml(project.hours)} hrs/week
                 </span>
 
                 <span>
-                    🔨 ${project.stage}
+                    🔨 ${escapeHtml(project.stage)}
                 </span>
 
             </div>
@@ -278,7 +268,7 @@ function displayProject(project) {
             </h2>
 
             <p class="project-about">
-                ${project.about}
+                ${escapeHtml(project.about)}
             </p>
 
 

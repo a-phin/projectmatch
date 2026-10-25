@@ -1,4 +1,5 @@
 import './style.css';
+import { escapeHtml } from './html.js';
 
 
 // GET STUDENT ID FROM URL
@@ -37,7 +38,7 @@ async function loadStudent() {
 
         const response =
             await fetch(
-                `http://127.0.0.1:5001/api/users/${studentId}`
+                `/api/users/${studentId}`
             );
 
 
@@ -106,7 +107,7 @@ function displayStudent(student) {
     const skillTags =
         skills
             .map(skill =>
-                `<span class="skill-tag">${skill}</span>`
+                `<span class="skill-tag">${escapeHtml(skill)}</span>`
             )
             .join("");
 
@@ -114,7 +115,7 @@ function displayStudent(student) {
     const interestTags =
         interests
             .map(interest =>
-                `<span class="interest-tag">${interest}</span>`
+                `<span class="interest-tag">${escapeHtml(interest)}</span>`
             )
             .join("");
 
@@ -138,7 +139,7 @@ function displayStudent(student) {
 
                 <div class="student-avatar">
 
-                    ${initials}
+                    ${escapeHtml(initials)}
 
                 </div>
 
@@ -146,16 +147,16 @@ function displayStudent(student) {
                 <div class="student-profile-name">
 
                     <h1>
-                        ${student.name}
+                        ${escapeHtml(student.name)}
                     </h1>
 
                     <p>
 
-                        ${student.major || "Major not listed"}
+                        ${escapeHtml(student.major || "Major not listed")}
 
                         ${
                             student.year
-                                ? ` • ${student.year}`
+                                ? ` • ${escapeHtml(student.year)}`
                                 : ""
                         }
 
@@ -216,7 +217,7 @@ function displayStudent(student) {
 
                     ${
                         student.availability
-                            ? `⏱ ${student.availability} hours/week`
+                            ? `⏱ ${escapeHtml(student.availability)} hours/week`
                             : "Not specified"
                     }
 

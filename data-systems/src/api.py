@@ -1,48 +1,13 @@
-#pip install flask flask-cors
+"""Compatibility launcher for the maintained Flask API in ``src/app.py``."""
 
-#This serves as the MAIN 
-# 1. It imports the data from SQL 
-# 2. ranks the projects from user peferences
-# 3. converts the ranked projects into a url react can understand 
+import sys
+from pathlib import Path
 
-# 1. Bring in the tools we need
-from flask import Flask, jsonify, request   # Flask = the web server
-from flask_cors import CORS                 # lets React talk to this server
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from db import get_conn, load_projects      # your database code
-from matching import rank_projects          # your scoring code
-
-# 2. Create the server
-app = Flask(__name__)
-CORS(app)
+from app import app  # noqa: E402
 
 
-# 3. A route: "when someone visits /api/matches, run this function"
-@app.get("/api/matches")
-def matches():
-
-    # Step A: read the student's info from the URL
-    skills_text = request.args.get("skills")        # "python,sql"
-    interests_text = request.args.get("interests")  # "web"
-    hours = request.args.get("hours", type=int)     # 6
-
-    # Step B: turn "python,sql" into ["python", "sql"]
-    skills = skills_text.split(",") if skills_text else []
-    interests = interests_text.split(",") if interests_text else []
-
-    student = {"skills": skills, "interests": interests, "hours": hours}
-
-    # Step C: get the projects from the database
-    conn = get_conn()
-    projects = load_projects(conn)
-    conn.close()
-
-    # Step D: rank them and send the result back
-    ranked = rank_projects(student, projects)
-    return jsonify(ranked)
-
-
-# 4. Start the server when you run `python api.py`
 if __name__ == "__main__":
-    app.run(debug=True)
-
+    app.run(port=5001)

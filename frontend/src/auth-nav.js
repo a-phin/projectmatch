@@ -1,3 +1,5 @@
+import { escapeHtml } from './html.js';
+
 export async function loadAccountNav() {
 
     const authNav =
@@ -11,7 +13,7 @@ export async function loadAccountNav() {
 
         const response =
             await fetch(
-                "http://127.0.0.1:5001/api/me",
+                "/api/me",
                 {
                     credentials: "include"
                 }
@@ -38,8 +40,10 @@ export async function loadAccountNav() {
         const user =
             await response.json();
 
+        const displayName = user.name || user.username || "Student";
+
         const initial =
-            (user.name || user.username)
+            displayName
                 .charAt(0)
                 .toUpperCase();
 
@@ -51,9 +55,9 @@ export async function loadAccountNav() {
             <a
                 href="profile.html"
                 class="account-avatar"
-                title="${user.name || user.username}"
+                title="${escapeHtml(displayName)}"
             >
-                ${initial}
+                ${escapeHtml(initial)}
             </a>
         `;
 

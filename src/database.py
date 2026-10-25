@@ -1,7 +1,9 @@
 """SQLite storage for ProjectMatch's first backend version."""
 
+import json
 import sqlite3
 import secrets
+from contextlib import contextmanager
 from pathlib import Path
 from werkzeug.security import generate_password_hash
 
@@ -9,7 +11,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PROJECTS_DB = DATA_DIR / "projects.db"
 USERS_DB = DATA_DIR / "users.db"
 
-CATEGORIES = ["Technology", "Research", "Community", "Creative"]
+CATEGORIES = ["Technology", "Research", "Community", "Creative", "Business", "Other"]
 
 
 def get_connection(path):
@@ -20,8 +22,22 @@ def get_connection(path):
     return connection
 
 
+@contextmanager
+def db_connection(path):
+    """Open a SQLite connection and always commit/rollback and close it."""
+    conn = get_connection(path)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
 def init_db():
-    with get_connection(PROJECTS_DB) as connection:
+    with db_connection(PROJECTS_DB) as connection:
         connection.executescript("""
             CREATE TABLE IF NOT EXISTS projects (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +47,11 @@ def init_db():
                 current_team_amount INTEGER NOT NULL DEFAULT 1,
                 max_team_amount INTEGER NOT NULL,
                 min_hours INTEGER,
-                max_hours INTEGER
+                max_hours INTEGER,
+                stage TEXT NOT NULL DEFAULT 'Building',
+                about TEXT NOT NULL DEFAULT '',
+                roles_needed TEXT NOT NULL DEFAULT '[]',
+                owner_id INTEGER
             );
 
             CREATE TABLE IF NOT EXISTS project_skills (
@@ -41,7 +61,7 @@ def init_db():
             );
         """)
 
-    with get_connection(USERS_DB) as connection:
+    with db_connection(USERS_DB) as connection:
         connection.executescript("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,7 +70,8 @@ def init_db():
                 name TEXT NOT NULL,
                 major TEXT NOT NULL,
                 year TEXT NOT NULL,
-                availability TEXT
+                availability TEXT,
+                looking_for TEXT NOT NULL DEFAULT 'Both'
             );
 
             CREATE TABLE IF NOT EXISTS user_skills (
@@ -64,22 +85,44 @@ def init_db():
                 interest TEXT NOT NULL,
                 PRIMARY KEY (user_id, interest)
             );
+
+            CREATE TABLE IF NOT EXISTS user_learning (
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                skill TEXT NOT NULL,
+                PRIMARY KEY (user_id, skill)
+            );
         """)
 
+    migrate_project_fields()
     migrate_user_accounts()
+
+
+def _add_missing_columns(connection, table, definitions):
+    columns = {row["name"] for row in connection.execute(f"PRAGMA table_info({table})")}
+    for name, definition in definitions.items():
+        if name not in columns:
+            connection.execute(f"ALTER TABLE {table} ADD COLUMN {name} {definition}")
+
+
+def migrate_project_fields():
+    """Add project fields introduced after the initial prototype schema."""
+    with db_connection(PROJECTS_DB) as connection:
+        _add_missing_columns(connection, "projects", {
+            "stage": "TEXT NOT NULL DEFAULT 'Building'",
+            "about": "TEXT NOT NULL DEFAULT ''",
+            "roles_needed": "TEXT NOT NULL DEFAULT '[]'",
+            "owner_id": "INTEGER",
+        })
 
 
 def migrate_user_accounts():
     """Add account columns to databases created before signup was implemented."""
-    with get_connection(USERS_DB) as connection:
-        columns = {
-            row["name"]
-            for row in connection.execute("PRAGMA table_info(users)")
-        }
-        if "username" not in columns:
-            connection.execute("ALTER TABLE users ADD COLUMN username TEXT")
-        if "password_hash" not in columns:
-            connection.execute("ALTER TABLE users ADD COLUMN password_hash TEXT")
+    with db_connection(USERS_DB) as connection:
+        _add_missing_columns(connection, "users", {
+            "username": "TEXT",
+            "password_hash": "TEXT",
+            "looking_for": "TEXT NOT NULL DEFAULT 'Both'",
+        })
 
         # Preserve existing demo profiles while giving them unique placeholder
         # account names. Their password is intentionally unknown; they can log
@@ -117,11 +160,15 @@ def _attach_project_skills(connection, project):
         "SELECT skill FROM project_skills WHERE project_id = ? ORDER BY skill",
         (project["id"],),
     )]
+    try:
+        project["looking_for"] = json.loads(project.pop("roles_needed", "[]") or "[]")
+    except (TypeError, json.JSONDecodeError):
+        project["looking_for"] = []
     return project
 
 
 def get_projects(category=None):
-    with get_connection(PROJECTS_DB) as connection:
+    with db_connection(PROJECTS_DB) as connection:
         if category and category != "All":
             rows = connection.execute(
                 "SELECT * FROM projects WHERE category = ? ORDER BY id", (category,)
@@ -132,20 +179,23 @@ def get_projects(category=None):
 
 
 def get_project(project_id):
-    with get_connection(PROJECTS_DB) as connection:
+    with db_connection(PROJECTS_DB) as connection:
         row = connection.execute("SELECT * FROM projects WHERE id = ?", (project_id,)).fetchone()
         return _attach_project_skills(connection, dict(row)) if row else None
 
 
-def add_project(data):
-    with get_connection(PROJECTS_DB) as connection:
+def add_project(data, owner_id=None):
+    with db_connection(PROJECTS_DB) as connection:
         cursor = connection.execute(
             """INSERT INTO projects
-               (title, description, category, current_team_amount, max_team_amount, min_hours, max_hours)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+               (title, description, category, current_team_amount, max_team_amount,
+                min_hours, max_hours, stage, about, roles_needed, owner_id)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (data["title"], data["description"], data["category"],
              data.get("current_team_amount", 1), data["max_team_amount"],
-             data.get("min_hours"), data.get("max_hours")),
+             data.get("min_hours"), data.get("max_hours"),
+             data.get("stage", "Building"), data.get("about", data["description"]),
+             json.dumps(data.get("looking_for", [])), owner_id),
         )
         project_id = cursor.lastrowid
         connection.executemany(
@@ -157,18 +207,18 @@ def add_project(data):
 
 
 def get_users():
-    with get_connection(USERS_DB) as connection:
+    with db_connection(USERS_DB) as connection:
         users = [
             dict(row)
             for row in connection.execute(
                 """
                 SELECT
                     id,
-                    username,
                     name,
                     major,
                     year,
-                    availability
+                    availability,
+                    looking_for
                 FROM users
                 ORDER BY id
                 """
@@ -181,6 +231,9 @@ def get_users():
             user["interests"] = [row["interest"] for row in connection.execute(
                 "SELECT interest FROM user_interests WHERE user_id = ? ORDER BY interest", (user["id"],)
             )]
+            user["skills_to_learn"] = [row["skill"] for row in connection.execute(
+                "SELECT skill FROM user_learning WHERE user_id = ? ORDER BY skill", (user["id"],)
+            )]
         return users
 
 
@@ -189,7 +242,7 @@ def get_user(user_id):
 
 def get_user_by_username(username):
 
-    with get_connection(USERS_DB) as connection:
+    with db_connection(USERS_DB) as connection:
 
         row = connection.execute(
             "SELECT * FROM users WHERE username = ?",
@@ -202,7 +255,7 @@ def get_user_by_username(username):
         return dict(row)
 
 def add_user(data):
-    with get_connection(USERS_DB) as connection:
+    with db_connection(USERS_DB) as connection:
 
         password_hash = generate_password_hash(
             data["password"],
@@ -211,8 +264,8 @@ def add_user(data):
 
         cursor = connection.execute(
             """INSERT INTO users
-               (username, password_hash, name, major, year, availability)
-               VALUES (?, ?, ?, ?, ?, ?)""",
+               (username, password_hash, name, major, year, availability, looking_for)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (
                 data["username"],
                 password_hash,
@@ -220,6 +273,7 @@ def add_user(data):
                 data["major"],
                 data["year"],
                 data.get("availability"),
+                data.get("looking_for", "Both"),
             ),
         )
 
@@ -240,21 +294,27 @@ def add_user(data):
                 for interest in data.get("interests", [])
             ],
         )
+        connection.executemany(
+            "INSERT INTO user_learning (user_id, skill) VALUES (?, ?)",
+            [(user_id, skill) for skill in data.get("skills_to_learn", [])],
+        )
 
     return get_user(user_id)
 
 
 def update_user(user_id, data):
-    with get_connection(USERS_DB) as connection:
+    with db_connection(USERS_DB) as connection:
         cursor = connection.execute(
-            "UPDATE users SET name = ?, major = ?, year = ?, availability = ? WHERE id = ?",
-            (data["name"], data["major"], data["year"], data.get("availability"), user_id),
+            "UPDATE users SET name = ?, major = ?, year = ?, availability = ?, looking_for = ? WHERE id = ?",
+            (data["name"], data["major"], data["year"], data.get("availability"),
+             data.get("looking_for", "Both"), user_id),
         )
         if cursor.rowcount == 0:
             return None
         for table, column, values in (
             ("user_skills", "skill", data.get("skills", [])),
             ("user_interests", "interest", data.get("interests", [])),
+            ("user_learning", "skill", data.get("skills_to_learn", [])),
         ):
             connection.execute(f"DELETE FROM {table} WHERE user_id = ?", (user_id,))
             connection.executemany(

@@ -1,5 +1,6 @@
 import './style.css';
 import { loadAccountNav } from './auth-nav.js';
+import { escapeHtml } from './html.js';
 
 loadAccountNav();
 
@@ -27,9 +28,9 @@ function displayProjects(projectList) {
 
         // CREATE SKILL TAGS
 
-        const skillTags = project.skills
+        const skillTags = (project.skills || [])
             .map(skill =>
-                `<span class="skill-tag">${skill}</span>`
+                `<span class="skill-tag">${escapeHtml(skill)}</span>`
             )
             .join("");
 
@@ -67,18 +68,18 @@ function displayProjects(projectList) {
             <div class="project-card-header">
 
                 <span class="project-category">
-                    ${project.category}
+                    ${escapeHtml(project.category)}
                 </span>
 
                 <span class="match-score">
-                    ${project.match}% Match
+                    ${project.match == null ? "Sign in for match" : `${escapeHtml(project.match)}% Match`}
                 </span>
 
             </div>
 
 
             <h2>
-                ${project.title}
+                ${escapeHtml(project.title)}
             </h2>
 
 
@@ -92,7 +93,7 @@ function displayProjects(projectList) {
 
 
             <p class="project-description">
-                ${project.description}
+                ${escapeHtml(project.description)}
             </p>
 
 
@@ -106,15 +107,15 @@ function displayProjects(projectList) {
             <div class="project-details">
 
                 <span>
-                    👥 ${project.members}/${project.teamSize}
+                    👥 ${escapeHtml(project.members)}/${escapeHtml(project.teamSize)}
                 </span>
 
                 <span>
-                    ⏱ ${project.hours} hrs/week
+                    ⏱ ${escapeHtml(project.hours)} hrs/week
                 </span>
 
                 <span>
-                    ${project.stage}
+                    ${escapeHtml(project.stage)}
                 </span>
 
             </div>
@@ -151,25 +152,9 @@ async function loadProjects() {
 
     try {
 
-        // For the hackathon demo, User 1 is the current user
-        const currentUserId = 1;
-
-
-        // Get projects and matches at the same time
-        const [
-            projectsResponse,
-            matchesResponse
-        ] = await Promise.all([
-
-            fetch(
-                "http://127.0.0.1:5001/api/projects"
-            ),
-
-            fetch(
-                `http://127.0.0.1:5001/api/users/${currentUserId}/matches`
-            )
-
-        ]);
+        const projectsResponse = await fetch(
+            "/api/projects"
+        );
 
 
         if (!projectsResponse.ok) {
@@ -179,18 +164,23 @@ async function loadProjects() {
         }
 
 
-        if (!matchesResponse.ok) {
-            throw new Error(
-                "Could not load project matches."
-            );
-        }
-
-
         const projectData =
             await projectsResponse.json();
 
-        const matchData =
-            await matchesResponse.json();
+        // Matching is optional for visitors; signed-in students get
+        // personalized scores from the session-backed endpoint.
+        let matchData = [];
+        try {
+            const matchesResponse = await fetch(
+                "/api/me/matches",
+                { credentials: "include" }
+            );
+            if (matchesResponse.ok) {
+                matchData = await matchesResponse.json();
+            }
+        } catch (error) {
+            console.warn("Could not load personalized matches:", error);
+        }
 
 
         // Create a lookup:
@@ -225,15 +215,17 @@ async function loadProjects() {
                     project.max_team_amount,
 
                 hours:
-                    `${project.min_hours}-${project.max_hours}`,
+                    project.min_hours == null
+                        ? "Not specified"
+                        : project.max_hours == null
+                            ? `${project.min_hours}+`
+                            : `${project.min_hours}-${project.max_hours}`,
 
                 stage:
                     project.stage || "Building",
 
                 match:
-                    match
-                        ? match.score
-                        : 0,
+                    match ? match.score : null,
 
                 matchBreakdown:
                     match
@@ -249,7 +241,7 @@ async function loadProjects() {
 
         projects.sort(
             (a, b) =>
-                b.match - a.match
+            (b.match ?? -1) - (a.match ?? -1)
         );
 
 

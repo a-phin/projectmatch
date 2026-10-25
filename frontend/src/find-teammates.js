@@ -1,4 +1,5 @@
 import './style.css';
+import { escapeHtml } from './html.js';
 
 
 let students = [];
@@ -24,7 +25,7 @@ async function loadStudents() {
 
         const response =
             await fetch(
-                "http://127.0.0.1:5001/api/users"
+                "/api/users"
             );
 
 
@@ -87,14 +88,14 @@ function displayStudents(studentList) {
         const skillTags =
             skills
                 .map(skill =>
-                    `<span class="skill-tag">${skill}</span>`
+                    `<span class="skill-tag">${escapeHtml(skill)}</span>`
                 )
                 .join("");
 
 
         const interests =
             studentInterests.length > 0
-                ? studentInterests.join(" • ")
+                ? studentInterests.map(escapeHtml).join(" • ")
                 : "No interests listed";
 
 
@@ -113,15 +114,15 @@ function displayStudents(studentList) {
                 <div>
 
                     <h2>
-                        ${student.name}
+                        ${escapeHtml(student.name)}
                     </h2>
 
                     <p class="student-major">
 
-                        ${student.major || "Major not listed"}
+                        ${escapeHtml(student.major || "Major not listed")}
 
                         ${student.year
-                            ? ` • ${student.year}`
+                                ? ` • ${escapeHtml(student.year)}`
                             : ""
                         }
 
@@ -171,7 +172,7 @@ function displayStudents(studentList) {
 
                 <p>
                     ${
-                        student.availability ||
+                        escapeHtml(student.availability) ||
                         "Not specified"
                     }
                     ${
@@ -187,7 +188,7 @@ function displayStudents(studentList) {
             <button
                 type="button"
                 class="view-profile-button"
-                data-id="${student.id}"
+                data-id="${escapeHtml(student.id)}"
             >
 
                 View Profile

@@ -52,19 +52,16 @@ form.addEventListener("submit", async (event) => {
 
 
     // GET HOURS AND SPLIT THEM
-    // Example: "3-5" becomes minHours = 3, maxHours = 5
+    // A value like "9+" is stored as a minimum of 9 with no upper bound.
 
     const hoursValue =
         document.getElementById("hours").value;
 
-    const hoursParts =
-        hoursValue.split("-");
-
-    const minHours =
-        Number(hoursParts[0]);
-
-    const maxHours =
-        Number(hoursParts[1]);
+    const hoursParts = hoursValue.split("-");
+    const minHours = Number(hoursParts[0].replace("+", ""));
+    const maxHours = hoursValue.endsWith("+")
+        ? null
+        : Number(hoursParts[1]);
 
 
     // CREATE PROJECT USING BACKEND FIELD NAMES
@@ -79,6 +76,9 @@ form.addEventListener("submit", async (event) => {
 
         category:
             document.getElementById("project-category").value,
+
+        stage:
+            document.getElementById("project-stage").value,
 
         skills:
             document
@@ -99,7 +99,18 @@ form.addEventListener("submit", async (event) => {
             minHours,
 
         max_hours:
-            maxHours
+            maxHours,
+
+        about:
+            document.getElementById("project-about").value,
+
+        looking_for:
+            document
+                .getElementById("roles-needed")
+                .value
+                .split(",")
+                .map(role => role.trim())
+                .filter(role => role !== "")
 
     };
 
@@ -111,9 +122,11 @@ form.addEventListener("submit", async (event) => {
 
         const response =
             await fetch(
-                "http://127.0.0.1:5001/api/projects",
+                "/api/projects",
                 {
                     method: "POST",
+
+                    credentials: "include",
 
                     headers: {
                         "Content-Type": "application/json"
