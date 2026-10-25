@@ -254,6 +254,17 @@ def get_user_by_username(username):
 
         return dict(row)
 
+
+def update_user_password(username, password):
+    """Replace an existing user's password hash; return whether user exists."""
+    password_hash = generate_password_hash(password, method="pbkdf2:sha256")
+    with db_connection(USERS_DB) as connection:
+        cursor = connection.execute(
+            "UPDATE users SET password_hash = ? WHERE username = ?",
+            (password_hash, username),
+        )
+        return cursor.rowcount == 1
+
 def add_user(data):
     with db_connection(USERS_DB) as connection:
 
