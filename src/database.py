@@ -14,6 +14,11 @@ USERS_DB = DATA_DIR / "users.db"
 CATEGORIES = ["Technology", "Research", "Community", "Creative", "Business", "Other"]
 
 
+def _unique_values(values):
+    """Trim list values and remove duplicates while preserving their order."""
+    return list(dict.fromkeys(value.strip() for value in values if value.strip()))
+
+
 def get_connection(path):
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(path)
@@ -292,22 +297,16 @@ def add_user(data):
 
         connection.executemany(
             "INSERT INTO user_skills (user_id, skill) VALUES (?, ?)",
-            [
-                (user_id, skill)
-                for skill in data.get("skills", [])
-            ],
+            [(user_id, skill) for skill in _unique_values(data.get("skills", []))],
         )
 
         connection.executemany(
             "INSERT INTO user_interests (user_id, interest) VALUES (?, ?)",
-            [
-                (user_id, interest)
-                for interest in data.get("interests", [])
-            ],
+            [(user_id, interest) for interest in _unique_values(data.get("interests", []))],
         )
         connection.executemany(
             "INSERT INTO user_learning (user_id, skill) VALUES (?, ?)",
-            [(user_id, skill) for skill in data.get("skills_to_learn", [])],
+            [(user_id, skill) for skill in _unique_values(data.get("skills_to_learn", []))],
         )
 
     return get_user(user_id)
@@ -330,6 +329,6 @@ def update_user(user_id, data):
             connection.execute(f"DELETE FROM {table} WHERE user_id = ?", (user_id,))
             connection.executemany(
                 f"INSERT INTO {table} (user_id, {column}) VALUES (?, ?)",
-                [(user_id, value) for value in values],
+                [(user_id, value) for value in _unique_values(values)],
             )
     return get_user(user_id)
