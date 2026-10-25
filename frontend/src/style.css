@@ -1187,3 +1187,102 @@ button {
     opacity: 0.6;
     cursor: default;
 }
+
+/* Authentication */
+
+.auth-page {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 480px;
+    padding: 40px;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    background: white;
+}
+
+.auth-card h1 {
+    margin-bottom: 10px;
+}
+
+.auth-description {
+    margin-bottom: 30px;
+}
+
+.auth-card .form-group {
+    margin-bottom: 20px;
+}
+
+.auth-card label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.auth-button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.auth-switch {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.error-message {
+    margin-top: 15px;
+}
+
+/* Account Navigation */
+
+#auth-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.account-avatar {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #6366f1;
+    color: white;
+
+    font-weight: 700;
+    font-size: 18px;
+
+    text-decoration: none;
+}
+
+.account-avatar:hover {
+    opacity: 0.85;
+}
+
+.signup-nav-button {
+    padding: 10px 18px;
+
+    border-radius: 8px;
+
+    background: #6366f1;
+    color: white !important;
+
+    text-decoration: none;
+}

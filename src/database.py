@@ -1,7 +1,9 @@
 """SQLite storage for ProjectMatch's first backend version."""
 
 import sqlite3
+import secrets
 from pathlib import Path
+from werkzeug.security import generate_password_hash
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PROJECTS_DB = DATA_DIR / "projects.db"
@@ -43,6 +45,8 @@ def init_db():
         connection.executescript("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
                 name TEXT NOT NULL,
                 major TEXT NOT NULL,
                 year TEXT NOT NULL,
@@ -62,26 +66,43 @@ def init_db():
             );
         """)
 
+    migrate_user_accounts()
+
+
+def migrate_user_accounts():
+    """Add account columns to databases created before signup was implemented."""
     with get_connection(USERS_DB) as connection:
-        connection.executescript("""
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                major TEXT NOT NULL,
-                year TEXT NOT NULL,
-                availability TEXT
-            );
-            CREATE TABLE IF NOT EXISTS user_skills (
-                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                skill TEXT NOT NULL,
-                PRIMARY KEY (user_id, skill)
-            );
-            CREATE TABLE IF NOT EXISTS user_interests (
-                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                interest TEXT NOT NULL,
-                PRIMARY KEY (user_id, interest)
-            );
-        """)
+        columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(users)")
+        }
+        if "username" not in columns:
+            connection.execute("ALTER TABLE users ADD COLUMN username TEXT")
+        if "password_hash" not in columns:
+            connection.execute("ALTER TABLE users ADD COLUMN password_hash TEXT")
+
+        # Preserve existing demo profiles while giving them unique placeholder
+        # account names. Their password is intentionally unknown; they can log
+        # in using a newly created account instead.
+        rows = connection.execute(
+            "SELECT id FROM users WHERE username IS NULL OR username = ''"
+        ).fetchall()
+        for row in rows:
+            connection.execute(
+                "UPDATE users SET username = ? WHERE id = ?",
+                (f"student-{row['id']}", row["id"]),
+            )
+        rows = connection.execute(
+            "SELECT id FROM users WHERE password_hash IS NULL OR password_hash = ''"
+        ).fetchall()
+        for row in rows:
+            connection.execute(
+                "UPDATE users SET password_hash = ? WHERE id = ?",
+                (generate_password_hash(secrets.token_urlsafe(32)), row["id"]),
+            )
+        connection.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username)"
+        )
 
 
 def reset_db():
@@ -137,7 +158,22 @@ def add_project(data):
 
 def get_users():
     with get_connection(USERS_DB) as connection:
-        users = [dict(row) for row in connection.execute("SELECT * FROM users ORDER BY id")]
+        users = [
+            dict(row)
+            for row in connection.execute(
+                """
+                SELECT
+                    id,
+                    username,
+                    name,
+                    major,
+                    year,
+                    availability
+                FROM users
+                ORDER BY id
+                """
+            )
+        ]
         for user in users:
             user["skills"] = [row["skill"] for row in connection.execute(
                 "SELECT skill FROM user_skills WHERE user_id = ? ORDER BY skill", (user["id"],)
@@ -151,20 +187,78 @@ def get_users():
 def get_user(user_id):
     return next((user for user in get_users() if user["id"] == user_id), None)
 
+def get_user_by_username(username):
+
+    with get_connection(USERS_DB) as connection:
+
+        row = connection.execute(
+            "SELECT * FROM users WHERE username = ?",
+            (username,),
+        ).fetchone()
+
+        if row is None:
+            return None
+
+        return dict(row)
 
 def add_user(data):
     with get_connection(USERS_DB) as connection:
-        cursor = connection.execute(
-            "INSERT INTO users (name, major, year, availability) VALUES (?, ?, ?, ?)",
-            (data["name"], data["major"], data["year"], data.get("availability")),
+
+        password_hash = generate_password_hash(
+            data["password"],
+            method="pbkdf2:sha256"
         )
+
+        cursor = connection.execute(
+            """INSERT INTO users
+               (username, password_hash, name, major, year, availability)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (
+                data["username"],
+                password_hash,
+                data["name"],
+                data["major"],
+                data["year"],
+                data.get("availability"),
+            ),
+        )
+
         user_id = cursor.lastrowid
+
         connection.executemany(
             "INSERT INTO user_skills (user_id, skill) VALUES (?, ?)",
-            [(user_id, skill) for skill in data.get("skills", [])],
+            [
+                (user_id, skill)
+                for skill in data.get("skills", [])
+            ],
         )
+
         connection.executemany(
             "INSERT INTO user_interests (user_id, interest) VALUES (?, ?)",
-            [(user_id, interest) for interest in data.get("interests", [])],
+            [
+                (user_id, interest)
+                for interest in data.get("interests", [])
+            ],
         )
+
+    return get_user(user_id)
+
+
+def update_user(user_id, data):
+    with get_connection(USERS_DB) as connection:
+        cursor = connection.execute(
+            "UPDATE users SET name = ?, major = ?, year = ?, availability = ? WHERE id = ?",
+            (data["name"], data["major"], data["year"], data.get("availability"), user_id),
+        )
+        if cursor.rowcount == 0:
+            return None
+        for table, column, values in (
+            ("user_skills", "skill", data.get("skills", [])),
+            ("user_interests", "interest", data.get("interests", [])),
+        ):
+            connection.execute(f"DELETE FROM {table} WHERE user_id = ?", (user_id,))
+            connection.executemany(
+                f"INSERT INTO {table} (user_id, {column}) VALUES (?, ?)",
+                [(user_id, value) for value in values],
+            )
     return get_user(user_id)

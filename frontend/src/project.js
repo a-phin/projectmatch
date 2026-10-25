@@ -1,125 +1,202 @@
 import './style.css';
 
 
-const projects = [
-
-    {
-        id: 1,
-
-        title: "FoodLoop",
-
-        description:
-            "Reduce food waste by connecting leftover campus food with students and community organizations.",
-
-        category: "Community",
-
-        stage: "Prototype",
-
-        match: 94,
-
-        members: 2,
-
-        teamSize: 4,
-
-        hours: "3-5",
-
-        skills: [
-            "Python",
-            "JavaScript",
-            "UI/UX"
-        ],
-
-        about:
-            "Student organizations frequently have leftover food after meetings and events. FoodLoop helps connect that surplus food with people and organizations that can use it before it goes to waste.",
-
-        lookingFor: [
-            "Frontend Developer",
-            "UI/UX Designer"
-        ]
-    },
-
-
-    {
-        id: 2,
-
-        title: "PlantVision",
-
-        description:
-            "Use computer vision to identify common plant diseases.",
-
-        category: "Research",
-
-        stage: "Building",
-
-        match: 87,
-
-        members: 3,
-
-        teamSize: 5,
-
-        hours: "4-6",
-
-        skills: [
-            "Python",
-            "AI",
-            "Biology"
-        ],
-
-        about:
-            "PlantVision explores how computer vision can help identify common plant diseases from images and make early detection more accessible.",
-
-        lookingFor: [
-            "Biology Student",
-            "Frontend Developer"
-        ]
-    }
-
-];
+// GET PROJECT ID FROM URL
 
 const params =
     new URLSearchParams(window.location.search);
 
 const projectId =
-    Number(params.get("id"));
+    params.get("id");
 
-
-const project =
-    projects.find(project => project.id === projectId);
 
 const container =
     document.getElementById("project-content");
 
 
-if (project) {
+// LOAD PROJECT FROM BACKEND
 
-    const skillTags = project.skills
+async function loadProject() {
+
+    if (!projectId) {
+        showNotFound();
+        return;
+    }
+
+    container.innerHTML = `
+        <p>Loading project...</p>
+    `;
+
+    try {
+
+        // Hackathon demo user
+        const currentUserId = 1;
+
+
+        // Get project information
+        // and match information
+
+        const [
+            projectResponse,
+            matchesResponse
+        ] = await Promise.all([
+
+            fetch(
+                `http://127.0.0.1:5001/api/projects/${projectId}`
+            ),
+
+            fetch(
+                `http://127.0.0.1:5001/api/users/${currentUserId}/matches`
+            )
+
+        ]);
+
+
+        if (projectResponse.status === 404) {
+            showNotFound();
+            return;
+        }
+
+
+        if (!projectResponse.ok) {
+            throw new Error(
+                "Could not load project."
+            );
+        }
+
+
+        if (!matchesResponse.ok) {
+            throw new Error(
+                "Could not load match information."
+            );
+        }
+
+
+        const data =
+            await projectResponse.json();
+
+        const matches =
+            await matchesResponse.json();
+
+
+        // Find the match result for this project
+
+        const matchResult =
+            matches.find(
+                match =>
+                    match.project_id ===
+                    Number(projectId)
+            );
+
+
+        const project = {
+
+            ...data,
+
+            members:
+                data.current_team_amount,
+
+            teamSize:
+                data.max_team_amount,
+
+            hours:
+                `${data.min_hours}-${data.max_hours}`,
+
+            stage:
+                data.stage || "Building",
+
+            match:
+                matchResult
+                    ? matchResult.score
+                    : 0,
+
+            matchBreakdown:
+                matchResult
+                    ? matchResult.breakdown
+                    : null,
+
+            about:
+                data.about ||
+                data.description,
+
+            lookingFor:
+                data.lookingFor || []
+
+        };
+
+
+        displayProject(project);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+            <h1>
+                Could not load project.
+            </h1>
+
+            <p>
+                Make sure the backend is running.
+            </p>
+
+            <a href="discover.html">
+                Return to Discover
+            </a>
+        `;
+
+    }
+
+}
+
+
+// DISPLAY PROJECT
+
+function displayProject(project) {
+
+    const skills =
+        project.skills || [];
+
+
+    const skillTags = skills
         .map(skill =>
             `<span class="skill-tag">${skill}</span>`
         )
         .join("");
 
 
-    const roles = project.lookingFor
-        .map(role =>
-            `<li>${role}</li>`
-        )
-        .join("");
+    const roles =
+        project.lookingFor
+            .map(role =>
+                `<li>${role}</li>`
+            )
+            .join("");
 
 
     let teamStatus = "";
     let statusClass = "";
 
-    const spotsLeft = project.teamSize - project.members;
+
+    const spotsLeft =
+        project.teamSize - project.members;
+
 
     if (spotsLeft <= 0) {
+
         teamStatus = "Team Full";
         statusClass = "status-full";
+
     } else if (spotsLeft === 1) {
+
         teamStatus = "1 Spot Left";
         statusClass = "status-limited";
+
     } else {
+
         teamStatus = "Looking for Teammates";
         statusClass = "status-open";
+
     }
 
 
@@ -135,7 +212,9 @@ if (project) {
                         ${project.category}
                     </span>
 
-                    <h1>${project.title}</h1>
+                    <h1>
+                        ${project.title}
+                    </h1>
 
                 </div>
 
@@ -158,10 +237,14 @@ if (project) {
             <p class="project-lead">
                 ${project.description}
             </p>
-            
+
+
             <div class="team-status ${statusClass}">
+
                 <span class="status-dot"></span>
+
                 ${teamStatus}
+
             </div>
 
 
@@ -190,17 +273,25 @@ if (project) {
             <hr>
 
 
-            <h2>About the Project</h2>
+            <h2>
+                About the Project
+            </h2>
 
             <p class="project-about">
                 ${project.about}
             </p>
 
 
-            <h2>We're Looking For</h2>
+            <h2>
+                We're Looking For
+            </h2>
+
 
             <ul class="role-list">
-                ${roles}
+                ${
+                    roles ||
+                    "<li>No specific roles listed yet.</li>"
+                }
             </ul>
 
 
@@ -226,10 +317,12 @@ if (project) {
 
     `;
 
+
     // REQUEST TO JOIN
 
     const joinButton =
         document.getElementById("join-button");
+
 
     const joinMessage =
         document.getElementById("join-message");
@@ -237,23 +330,37 @@ if (project) {
 
     joinButton.addEventListener("click", () => {
 
-        joinMessage.style.display = "block";
+        joinMessage.style.display =
+            "block";
 
         joinButton.textContent =
             "Request Sent";
 
-        joinButton.disabled = true;
+        joinButton.disabled =
+            true;
 
     });
 
-} else {
+}
+
+
+// PROJECT NOT FOUND
+
+function showNotFound() {
 
     container.innerHTML = `
+
         <h1>Project not found.</h1>
 
         <a href="discover.html">
             Return to Discover
         </a>
+
     `;
 
 }
+
+
+// LOAD PROJECT WHEN PAGE OPENS
+
+loadProject();

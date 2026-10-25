@@ -37,18 +37,78 @@ PROJECTS = [
 ]
 
 USERS = [
-    {"name": "Maya Patel", "major": "Computer Science", "year": "Third Year",
-     "availability": "3-5", "skills": ["Python", "Machine Learning", "JavaScript"],
-     "interests": ["AI", "Healthcare", "Sustainability"]},
-    {"name": "Jordan Lee", "major": "Visual Communication Design", "year": "Second Year",
-     "availability": "3-5", "skills": ["UI/UX", "Figma", "Graphic Design"],
-     "interests": ["Education", "Accessibility", "Community"]},
-    {"name": "Ethan Williams", "major": "Business Administration", "year": "Third Year",
-     "availability": "1-2", "skills": ["Marketing", "Business Strategy", "Presentations"],
-     "interests": ["Startups", "Technology", "Entrepreneurship"]},
-    {"name": "Sofia Martinez", "major": "Biology", "year": "Second Year",
-     "availability": "3-5", "skills": ["Research", "Data Analysis", "Scientific Writing"],
-     "interests": ["Healthcare", "Environment", "Research"]},
+    {
+        "username": "maya",
+        "password": "demo123",
+        "name": "Maya Patel",
+        "major": "Computer Science",
+        "year": "Third Year",
+        "availability": "3-5",
+        "skills": [
+            "Python",
+            "Machine Learning",
+            "JavaScript"
+        ],
+        "interests": [
+            "AI",
+            "Healthcare",
+            "Sustainability"
+        ]
+    },
+    {
+        "username": "jordan",
+        "password": "demo123",
+        "name": "Jordan Lee",
+        "major": "Visual Communication Design",
+        "year": "Second Year",
+        "availability": "3-5",
+        "skills": [
+            "UI/UX",
+            "Figma",
+            "Graphic Design"
+        ],
+        "interests": [
+            "Education",
+            "Accessibility",
+            "Community"
+        ]
+    },
+    {
+        "username": "ethan",
+        "password": "demo123",
+        "name": "Ethan Williams",
+        "major": "Business Administration",
+        "year": "Third Year",
+        "availability": "1-2",
+        "skills": [
+            "Marketing",
+            "Business Strategy",
+            "Presentations"
+        ],
+        "interests": [
+            "Startups",
+            "Technology",
+            "Entrepreneurship"
+        ]
+    },
+    {
+        "username": "sofia",
+        "password": "demo123",
+        "name": "Sofia Martinez",
+        "major": "Biology",
+        "year": "Second Year",
+        "availability": "3-5",
+        "skills": [
+            "Research",
+            "Data Analysis",
+            "Scientific Writing"
+        ],
+        "interests": [
+            "Healthcare",
+            "Environment",
+            "Research"
+        ]
+    },
 ]
 
 

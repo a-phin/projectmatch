@@ -12,7 +12,7 @@ def rank_projects(student, projects):
 
 def score_project(student, project):
     skills = score_skills(student.get("skills"), project.get("skills"))
-    hours = score_hours(student.get("hours"), project.get("min_hours"), project.get("max_hours"))
+    hours = score_hours(student.get("availability"), project.get("min_hours"), project.get("max_hours"))
     category = score_category(student.get("interests"), project["category"])
 
     return {
@@ -33,18 +33,38 @@ def score_skills(student_skills, project_skills):
 
 
 def score_hours(student_hours, min_hours, max_hours):
-    """Up to 25 points: does the student's weekly time fit the project?"""
-    if student_hours is None:
-        return 12.5  # no data, so give half the points so it doesn't go unnoticed
+    """Up to 25 points based on how well the student's availability
+    overlaps with the project's expected weekly hours."""
 
-    min_hours = min_hours or 0
-    max_hours = max_hours or 999
+    if not student_hours:
+        return 12.5
 
-    if student_hours < min_hours:
-        return 0     # not enough time
-    if student_hours > max_hours:
-        return 20    # more time than needed: fine, not perfect
-    return 25        # fits the range
+    # Student availability may be stored as "3-5"
+    # or as a single value such as "5".
+    try:
+        if isinstance(student_hours, str) and "-" in student_hours:
+            parts = student_hours.split("-")
+            student_min = int(parts[0].strip())
+            student_max = int(parts[1].strip())
+        else:
+            student_min = int(student_hours)
+            student_max = int(student_hours)
+    except (ValueError, TypeError):
+        return 12.5
+
+    project_min = min_hours or 0
+    project_max = max_hours or 999
+
+    # No overlap between the ranges
+    if student_max < project_min:
+        return 0
+
+    # Student has more availability than the project needs
+    if student_min > project_max:
+        return 20
+
+    # Availability ranges overlap
+    return 25
 
 
 def score_category(student_interests, category):

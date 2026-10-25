@@ -8,10 +8,12 @@ const successMessage =
     document.getElementById("profile-success");
 
 
-profileForm.addEventListener("submit", (event) => {
+profileForm.addEventListener("submit", async (event) => {
 
     event.preventDefault();
 
+
+    // Save the profile on the account created during signup.
 
     const profile = {
 
@@ -29,35 +31,92 @@ profileForm.addEventListener("submit", (event) => {
                 .getElementById("skills")
                 .value
                 .split(",")
-                .map(skill => skill.trim()),
+                .map(skill => skill.trim())
+                .filter(skill => skill !== ""),
 
         interests:
             document
                 .getElementById("interests")
                 .value
                 .split(",")
-                .map(interest => interest.trim()),
-
-        learning:
-            document
-                .getElementById("learning")
-                .value
-                .split(",")
-                .map(skill => skill.trim())
-                .filter(skill => skill !== ""),
+                .map(interest => interest.trim())
+                .filter(interest => interest !== ""),
 
         availability:
-            document.getElementById("availability").value,
-
-        lookingFor:
-            document.getElementById("looking-for").value
+            document.getElementById("availability").value
 
     };
 
 
-    console.log("Student Profile:", profile);
+    console.log("Sending Student Profile:", profile);
 
 
-    successMessage.style.display = "block";
+    try {
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:5001/api/me",
+                {
+                    method: "PUT",
+
+                    credentials: "include",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(profile)
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const errorData =
+                await response.json();
+
+            throw new Error(
+                errorData.error ||
+                "Could not create profile."
+            );
+
+        }
+
+
+        const createdUser =
+            await response.json();
+
+
+        console.log(
+            "Student Profile Created:",
+            createdUser
+        );
+
+
+        // SHOW SUCCESS ONLY AFTER SERVER SAVES USER
+
+        successMessage.style.display =
+            "block";
+
+
+    } catch (error) {
+
+        console.error(
+            "Error creating profile:",
+            error
+        );
+
+
+        successMessage.style.display =
+            "none";
+
+
+        alert(
+            "Could not create profile. " +
+            error.message
+        );
+
+    }
 
 });

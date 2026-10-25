@@ -1,7 +1,5 @@
 import './style.css';
 
-import { students } from './data/students.js';
-
 
 // GET STUDENT ID FROM URL
 
@@ -9,15 +7,7 @@ const params =
     new URLSearchParams(window.location.search);
 
 const studentId =
-    Number(params.get("id"));
-
-
-// FIND STUDENT
-
-const student =
-    students.find(student =>
-        student.id === studentId
-    );
+    params.get("id");
 
 
 const container =
@@ -26,12 +16,95 @@ const container =
     );
 
 
+// LOAD STUDENT FROM BACKEND
+
+async function loadStudent() {
+
+    if (!studentId) {
+
+        showNotFound();
+        return;
+
+    }
+
+
+    container.innerHTML = `
+        <p>Loading student...</p>
+    `;
+
+
+    try {
+
+        const response =
+            await fetch(
+                `http://127.0.0.1:5001/api/users/${studentId}`
+            );
+
+
+        if (response.status === 404) {
+
+            showNotFound();
+            return;
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Could not load student."
+            );
+
+        }
+
+
+        const student =
+            await response.json();
+
+
+        displayStudent(student);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        container.innerHTML = `
+
+            <h1>
+                Could not load student.
+            </h1>
+
+            <p>
+                Make sure the backend is running.
+            </p>
+
+            <a href="find-teammates.html">
+                Return to Find Teammates
+            </a>
+
+        `;
+
+    }
+
+}
+
+
 // DISPLAY STUDENT
 
-if (student) {
+function displayStudent(student) {
+
+    const skills =
+        student.skills || [];
+
+
+    const interests =
+        student.interests || [];
+
 
     const skillTags =
-        student.skills
+        skills
             .map(skill =>
                 `<span class="skill-tag">${skill}</span>`
             )
@@ -39,18 +112,19 @@ if (student) {
 
 
     const interestTags =
-        student.interests
+        interests
             .map(interest =>
                 `<span class="interest-tag">${interest}</span>`
             )
             .join("");
 
 
-    const matchReasons =
-        student.reasons
-            .map(reason =>
-                `<li>✓ ${reason}</li>`
-            )
+    // CREATE INITIALS FOR AVATAR
+
+    const initials =
+        student.name
+            .split(" ")
+            .map(name => name[0])
             .join("");
 
 
@@ -64,10 +138,7 @@ if (student) {
 
                 <div class="student-avatar">
 
-                    ${student.name
-                        .split(" ")
-                        .map(name => name[0])
-                        .join("")}
+                    ${initials}
 
                 </div>
 
@@ -79,23 +150,16 @@ if (student) {
                     </h1>
 
                     <p>
-                        ${student.major}
-                        •
-                        ${student.year}
+
+                        ${student.major || "Major not listed"}
+
+                        ${
+                            student.year
+                                ? ` • ${student.year}`
+                                : ""
+                        }
+
                     </p>
-
-                </div>
-
-
-                <div class="large-match-score">
-
-                    <strong>
-                        ${student.match}%
-                    </strong>
-
-                    <span>
-                        Match
-                    </span>
 
                 </div>
 
@@ -114,7 +178,10 @@ if (student) {
 
                 <div class="skill-list">
 
-                    ${skillTags}
+                    ${
+                        skillTags ||
+                        "<span>No skills listed</span>"
+                    }
 
                 </div>
 
@@ -129,7 +196,10 @@ if (student) {
 
                 <div class="interest-list">
 
-                    ${interestTags}
+                    ${
+                        interestTags ||
+                        "<span>No interests listed</span>"
+                    }
 
                 </div>
 
@@ -143,23 +213,14 @@ if (student) {
                 </h2>
 
                 <p>
-                    ⏱ ${student.availability} hours/week
+
+                    ${
+                        student.availability
+                            ? `⏱ ${student.availability} hours/week`
+                            : "Not specified"
+                    }
+
                 </p>
-
-            </div>
-
-
-            <div class="profile-match-reasons">
-
-                <h2>
-                    Why ${student.name} could be a good teammate
-                </h2>
-
-                <ul>
-
-                    ${matchReasons}
-
-                </ul>
 
             </div>
 
@@ -193,11 +254,15 @@ if (student) {
     // INVITE BUTTON
 
     const inviteButton =
-        document.getElementById("invite-button");
+        document.getElementById(
+            "invite-button"
+        );
 
 
     const inviteMessage =
-        document.getElementById("invite-message");
+        document.getElementById(
+            "invite-message"
+        );
 
 
     inviteButton.addEventListener(
@@ -218,8 +283,12 @@ if (student) {
         }
     );
 
+}
 
-} else {
+
+// STUDENT NOT FOUND
+
+function showNotFound() {
 
     container.innerHTML = `
 
@@ -234,3 +303,8 @@ if (student) {
     `;
 
 }
+
+
+// LOAD STUDENT WHEN PAGE OPENS
+
+loadStudent();

@@ -1,138 +1,10 @@
 import './style.css';
+import { loadAccountNav } from './auth-nav.js';
+
+loadAccountNav();
 
 
-const projects = [
-
-    {
-        id: 1,
-        title: "FoodLoop",
-
-        description:
-            "Reduce food waste by connecting leftover campus food with students and community organizations.",
-
-        category: "Community",
-
-        skills: [
-            "Python",
-            "JavaScript",
-            "UI/UX"
-        ],
-
-        members: 2,
-        teamSize: 4,
-
-        hours: "3-5",
-
-        stage: "Prototype",
-
-        match: 94
-    },
-
-
-    {
-        id: 2,
-        title: "PlantVision",
-
-        description:
-            "Use computer vision to help identify common plant diseases from photos.",
-
-        category: "Research",
-
-        skills: [
-            "Python",
-            "AI",
-            "Biology"
-        ],
-
-        members: 3,
-        teamSize: 5,
-
-        hours: "4-6",
-
-        stage: "Building",
-
-        match: 87
-    },
-
-
-    {
-        id: 3,
-        title: "Campus Closet",
-
-        description:
-            "Create a student clothing exchange that makes donating and finding clothes easier.",
-
-        category: "Community",
-
-        skills: [
-            "Marketing",
-            "Design",
-            "Web Development"
-        ],
-
-        members: 2,
-        teamSize: 5,
-
-        hours: "2-4",
-
-        stage: "Idea",
-
-        match: 82
-    },
-
-
-    {
-        id: 4,
-        title: "StoryMap",
-
-        description:
-            "Create an interactive map that shares stories from local businesses and community members.",
-
-        category: "Creative",
-
-        skills: [
-            "Journalism",
-            "Photography",
-            "Web Design"
-        ],
-
-        members: 3,
-        teamSize: 6,
-
-        hours: "3-5",
-
-        stage: "Prototype",
-
-        match: 71
-    },
-
-
-    {
-        id: 5,
-        title: "StudySpot",
-
-        description:
-            "Help students find available study spaces based on location, noise level, and amenities.",
-
-        category: "Technology",
-
-        skills: [
-            "JavaScript",
-            "Python",
-            "Data"
-        ],
-
-        members: 2,
-        teamSize: 4,
-
-        hours: "4-6",
-
-        stage: "Building",
-
-        match: 91
-    }
-
-];
+let projects = [];
 
 
 // DISPLAY PROJECTS
@@ -267,9 +139,139 @@ function displayProjects(projectList) {
 }
 
 
-// DISPLAY PROJECTS WHEN PAGE LOADS
+// LOAD PROJECTS FROM BACKEND
 
-displayProjects(projects);
+async function loadProjects() {
+
+    const container =
+        document.getElementById("project-container");
+
+    container.innerHTML =
+        "<p>Loading projects...</p>";
+
+    try {
+
+        // For the hackathon demo, User 1 is the current user
+        const currentUserId = 1;
+
+
+        // Get projects and matches at the same time
+        const [
+            projectsResponse,
+            matchesResponse
+        ] = await Promise.all([
+
+            fetch(
+                "http://127.0.0.1:5001/api/projects"
+            ),
+
+            fetch(
+                `http://127.0.0.1:5001/api/users/${currentUserId}/matches`
+            )
+
+        ]);
+
+
+        if (!projectsResponse.ok) {
+            throw new Error(
+                "Could not load projects."
+            );
+        }
+
+
+        if (!matchesResponse.ok) {
+            throw new Error(
+                "Could not load project matches."
+            );
+        }
+
+
+        const projectData =
+            await projectsResponse.json();
+
+        const matchData =
+            await matchesResponse.json();
+
+
+        // Create a lookup:
+        // project ID -> matching result
+
+        const matchMap = {};
+
+        matchData.forEach(match => {
+
+            matchMap[match.project_id] =
+                match;
+
+        });
+
+
+        // Combine project information
+        // with matching information
+
+        projects = projectData.map(project => {
+
+            const match =
+                matchMap[project.id];
+
+            return {
+
+                ...project,
+
+                members:
+                    project.current_team_amount,
+
+                teamSize:
+                    project.max_team_amount,
+
+                hours:
+                    `${project.min_hours}-${project.max_hours}`,
+
+                stage:
+                    project.stage || "Building",
+
+                match:
+                    match
+                        ? match.score
+                        : 0,
+
+                matchBreakdown:
+                    match
+                        ? match.breakdown
+                        : null
+
+            };
+
+        });
+
+
+        // Sort highest match first
+
+        projects.sort(
+            (a, b) =>
+                b.match - a.match
+        );
+
+
+        displayProjects(projects);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+            <p>
+                Could not load projects.
+                Make sure the backend is running.
+            </p>
+        `;
+
+    }
+
+}
+
+loadProjects();
 
 
 // VIEW PROJECT BUTTON

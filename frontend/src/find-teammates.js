@@ -1,6 +1,7 @@
 import './style.css';
 
-import { students } from './data/students.js';
+
+let students = [];
 
 
 const studentContainer =
@@ -9,6 +10,60 @@ const studentContainer =
 
 const searchInput =
     document.getElementById("teammate-search");
+
+
+// LOAD STUDENTS FROM BACKEND
+
+async function loadStudents() {
+
+    studentContainer.innerHTML =
+        "<p>Loading students...</p>";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:5001/api/users"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Could not load students."
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        students = data;
+
+
+        displayStudents(students);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        studentContainer.innerHTML = `
+
+            <p>
+                Could not load students.
+                Make sure the backend is running.
+            </p>
+
+        `;
+
+    }
+
+}
 
 
 // DISPLAY STUDENTS
@@ -21,8 +76,16 @@ function displayStudents(studentList) {
     studentList.forEach(student => {
 
 
+        const skills =
+            student.skills || [];
+
+
+        const studentInterests =
+            student.interests || [];
+
+
         const skillTags =
-            student.skills
+            skills
                 .map(skill =>
                     `<span class="skill-tag">${skill}</span>`
                 )
@@ -30,15 +93,9 @@ function displayStudents(studentList) {
 
 
         const interests =
-            student.interests.join(" • ");
-
-
-        const matchReasons =
-            student.reasons
-                .map(reason =>
-                    `<li>✓ ${reason}</li>`
-                )
-                .join("");
+            studentInterests.length > 0
+                ? studentInterests.join(" • ")
+                : "No interests listed";
 
 
         const card =
@@ -61,18 +118,14 @@ function displayStudents(studentList) {
 
                     <p class="student-major">
 
-                        ${student.major}
-                        •
-                        ${student.year}
+                        ${student.major || "Major not listed"}
+
+                        ${student.year
+                            ? ` • ${student.year}`
+                            : ""
+                        }
 
                     </p>
-
-                </div>
-
-
-                <div class="student-match">
-
-                    ${student.match}% Match
 
                 </div>
 
@@ -87,7 +140,10 @@ function displayStudents(studentList) {
 
                 <div class="skill-list">
 
-                    ${skillTags}
+                    ${
+                        skillTags ||
+                        "<span>No skills listed</span>"
+                    }
 
                 </div>
 
@@ -114,21 +170,16 @@ function displayStudents(studentList) {
                 </h3>
 
                 <p>
-                    ${student.availability} hrs/week
+                    ${
+                        student.availability ||
+                        "Not specified"
+                    }
+                    ${
+                        student.availability
+                            ? " hrs/week"
+                            : ""
+                    }
                 </p>
-
-            </div>
-
-
-            <div class="match-reasons">
-
-                <h3>
-                    Why they match
-                </h3>
-
-                <ul>
-                    ${matchReasons}
-                </ul>
 
             </div>
 
@@ -153,11 +204,6 @@ function displayStudents(studentList) {
 }
 
 
-// DISPLAY EVERYONE INITIALLY
-
-displayStudents(students);
-
-
 // SEARCH
 
 searchInput.addEventListener("input", () => {
@@ -172,20 +218,36 @@ searchInput.addEventListener("input", () => {
         students.filter(student => {
 
 
+            const name =
+                student.name || "";
+
+
+            const major =
+                student.major || "";
+
+
+            const skills =
+                student.skills || [];
+
+
+            const interests =
+                student.interests || [];
+
+
             const nameMatch =
-                student.name
+                name
                     .toLowerCase()
                     .includes(searchText);
 
 
             const majorMatch =
-                student.major
+                major
                     .toLowerCase()
                     .includes(searchText);
 
 
             const skillMatch =
-                student.skills.some(skill =>
+                skills.some(skill =>
                     skill
                         .toLowerCase()
                         .includes(searchText)
@@ -193,7 +255,7 @@ searchInput.addEventListener("input", () => {
 
 
             const interestMatch =
-                student.interests.some(interest =>
+                interests.some(interest =>
                     interest
                         .toLowerCase()
                         .includes(searchText)
@@ -213,6 +275,7 @@ searchInput.addEventListener("input", () => {
     displayStudents(filteredStudents);
 
 });
+
 
 // VIEW STUDENT PROFILE
 
@@ -237,3 +300,8 @@ studentContainer.addEventListener(
 
     }
 );
+
+
+// LOAD STUDENTS WHEN PAGE OPENS
+
+loadStudents();

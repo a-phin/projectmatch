@@ -46,10 +46,28 @@ teamSizeInput.addEventListener("blur", () => {
 
 // FORM SUBMISSION
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
 
     event.preventDefault();
 
+
+    // GET HOURS AND SPLIT THEM
+    // Example: "3-5" becomes minHours = 3, maxHours = 5
+
+    const hoursValue =
+        document.getElementById("hours").value;
+
+    const hoursParts =
+        hoursValue.split("-");
+
+    const minHours =
+        Number(hoursParts[0]);
+
+    const maxHours =
+        Number(hoursParts[1]);
+
+
+    // CREATE PROJECT USING BACKEND FIELD NAMES
 
     const project = {
 
@@ -62,45 +80,100 @@ form.addEventListener("submit", (event) => {
         category:
             document.getElementById("project-category").value,
 
-        stage:
-            document.getElementById("project-stage").value,
-
         skills:
             document
                 .getElementById("project-skills")
                 .value
                 .split(",")
-                .map(skill => skill.trim()),
+                .map(skill => skill.trim())
+                .filter(skill => skill !== ""),
 
-        teamSize:
+        current_team_amount: 1,
+
+        max_team_amount:
             Number(
                 document.getElementById("team-size").value
             ),
 
-        hours:
-            document.getElementById("hours").value,
+        min_hours:
+            minHours,
 
-        about:
-            document.getElementById("project-about").value,
-
-        lookingFor:
-            document
-                .getElementById("roles-needed")
-                .value
-                .split(",")
-                .map(role => role.trim()),
-
-        members: 1
+        max_hours:
+            maxHours
 
     };
 
 
-    console.log("New Project:", project);
+    console.log("Sending Project:", project);
 
 
-    successMessage.style.display = "block";
+    try {
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:5001/api/projects",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(project)
+                }
+            );
 
 
-    form.reset();
+        if (!response.ok) {
+
+            const errorData =
+                await response.json();
+
+            throw new Error(
+                errorData.error ||
+                "Could not create project."
+            );
+
+        }
+
+
+        const createdProject =
+            await response.json();
+
+
+        console.log(
+            "Project Created:",
+            createdProject
+        );
+
+
+        // ONLY SHOW SUCCESS IF BACKEND SUCCEEDED
+
+        successMessage.style.display =
+            "block";
+
+
+        form.reset();
+
+
+    } catch (error) {
+
+        console.error(
+            "Error creating project:",
+            error
+        );
+
+
+        successMessage.style.display =
+            "none";
+
+
+        alert(
+            "Could not create project. " +
+            error.message
+        );
+
+    }
 
 });
