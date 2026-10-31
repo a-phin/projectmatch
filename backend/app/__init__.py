@@ -5,8 +5,8 @@ from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from werkzeug.security import check_password_hash
 
-import database as db
-from matching import rank_projects
+import backend.app.database as db
+from backend.app.matching import rank_projects
 
 app = Flask(__name__)
 app.secret_key = os.environ.setdefault("PROJECTMATCH_SECRET_KEY", secrets.token_hex(32))
